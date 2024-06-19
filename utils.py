@@ -94,7 +94,12 @@ def predict(classifier, data_loader, device):
 
 
 # Device configuration
-def get_device():
+def get_device(mps = False):
+    if mps == True:
+
+        device = "mps:0" if torch.cuda.is_available() else "cpu" 
+
+        mps = device =='mps:0'
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     cuda = device == "cuda"
