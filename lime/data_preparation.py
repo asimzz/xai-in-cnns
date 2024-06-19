@@ -1,36 +1,29 @@
+import os
+from sklearn.model_selection import train_test_split
+import shutil
 
+def prepare_data(data_dir, train_dir, val_dir):
+    os.makedirs(train_dir, exist_ok=True)
+    os.makedirs(val_dir, exist_ok=True)
 
-# Define data transformations for data augmentation and normalization
-data_transforms = {
-    'train': transforms.Compose([
-        #transforms.RandomResizedCrop(224),
-        transforms.Resize((299, 299)),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    ]),
-    'val': transforms.Compose([
-        #transforms.Resize(256),
-        transforms.Resize((299, 299)),
-        transforms.CenterCrop(224),
-        transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    ]),
-}
+    classes = [d for d in os.listdir(data_dir) if os.path.isdir(os.path.join(data_dir, d))]
 
-# Define the data directory
-data_dir = '/Users/millicentomondi/Documents/XAI_GROUP/lime3'
+    for cls in classes:
+        os.makedirs(os.path.join(train_dir, cls), exist_ok=True)
+        os.makedirs(os.path.join(val_dir, cls), exist_ok=True)
 
-# Create data loaders
-image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in ['train', 'val']}
+        cls_dir = os.path.join(data_dir, cls)
+        images = [f for f in os.listdir(cls_dir) if os.path.isfile(os.path.join(cls_dir, f))]
 
+        if len(images) == 0:
+            print(f"No images found for class {cls}. Skipping...")
+            continue
 
-# In[7]:
+        train_images, val_images = train_test_split(images, test_size=0.2, random_state=42)
 
+        for img in train_images:
+            shutil.move(os.path.join(cls_dir, img), os.path.join(train_dir, cls, img))
+        for img in val_images:
+            shutil.move(os.path.join(cls_dir, img), os.path.join(val_dir, cls, img))
 
-dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=16, shuffle=True, num_workers=4) for x in ['train', 'val']}
-dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
-print(dataset_sizes)
-
-class_names = image_datasets['train'].classes
-class_names
+    print("Dataset split into train and validation folders successfully.")
