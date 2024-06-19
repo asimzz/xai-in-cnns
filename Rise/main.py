@@ -10,7 +10,7 @@ from matplotlib.pyplot import imshow
 from torchvision import models, transforms
 from torchvision.utils import save_image
 from models import model1
-from rise import RISE
+from Rise.rise import RISE
 from utils.visualize import visualize, reverse_normalize
 
 from utils.setup import get_device , get_tranformer , give_data,train,model_evaluation
