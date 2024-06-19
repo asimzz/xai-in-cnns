@@ -2,6 +2,7 @@ import pandas as pd
 from PIL import Image
 from pathlib import Path
 from torch.utils.data import Dataset
+from .utils import split_dataset_folder, unzip_dataset
 
 
 class FlowersDataset(Dataset):
